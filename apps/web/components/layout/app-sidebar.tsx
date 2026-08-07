@@ -13,6 +13,7 @@ import {
   CalendarDays,
   FileBarChart,
   LayoutDashboard,
+  Bot,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
   { href: "/entregas", label: "Entregas", icon: CalendarClock },
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
   { href: "/relatorios", label: "Relatórios", icon: FileBarChart },
+  { href: "/ia", label: "Agente de IA", icon: Bot },
 ];
 
 export function AppSidebar() {
