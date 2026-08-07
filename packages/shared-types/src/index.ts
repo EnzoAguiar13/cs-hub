@@ -9,3 +9,4 @@ export * from "./campaign.schema";
 export * from "./delivery.schema";
 export * from "./contract.schema";
 export * from "./exclusivity.schema";
+export * from "./dashboard.schema";

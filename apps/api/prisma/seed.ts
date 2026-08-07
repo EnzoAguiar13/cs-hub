@@ -14,6 +14,7 @@ const RESOURCES = [
   "deliveries",
   "contracts",
   "exclusivities",
+  "dashboard",
 ] as const;
 const ACTIONS = ["create", "read", "update", "delete", "export"] as const;
 
@@ -30,6 +31,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     deliveries: ACTIONS,
     contracts: ACTIONS,
     exclusivities: ACTIONS,
+    dashboard: ACTIONS,
   },
   MANAGER: {
     creators: ["create", "read", "update", "delete", "export"],
@@ -41,6 +43,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     deliveries: ["create", "read", "update", "export"],
     contracts: ["create", "read", "update", "export"],
     exclusivities: ["create", "read", "update", "export"],
+    dashboard: ["read"],
   },
   CS: {
     creators: ["create", "read", "update"],
@@ -50,6 +53,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     deliveries: ["create", "read", "update"],
     contracts: ["create", "read"],
     exclusivities: ["read"],
+    dashboard: ["read"],
   },
   FINANCE: {
     creators: ["read", "export"],
@@ -57,11 +61,13 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     finance: ["create", "read", "update", "export"],
     withdrawals: ["create", "read", "update", "export"],
     exclusivities: ["read", "export"],
+    dashboard: ["read"],
   },
   MARKETING: {
     creators: ["read"],
     campaigns: ["create", "read", "update", "export"],
     deliveries: ["read"],
+    dashboard: ["read"],
   },
   AFFILIATE: {},
   VIEWER: {
@@ -73,6 +79,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     deliveries: ["read"],
     contracts: ["read"],
     exclusivities: ["read"],
+    dashboard: ["read"],
   },
 };
 

@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users2, Sparkles, Handshake, Wallet, Banknote, Megaphone, CalendarClock, CalendarDays, FileBarChart } from "lucide-react";
+import {
+  Users2,
+  Sparkles,
+  Handshake,
+  Wallet,
+  Banknote,
+  Megaphone,
+  CalendarClock,
+  CalendarDays,
+  FileBarChart,
+  LayoutDashboard,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const NAV_ITEMS = [
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/creators", label: "Creators", icon: Users2 },
   { href: "/deals", label: "Deals", icon: Handshake },
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
@@ -33,10 +45,10 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex h-9 items-center gap-2 px-2">
+        <Link href="/" className="flex h-9 items-center gap-2 px-2">
           <Sparkles className="h-5 w-5 shrink-0 text-primary" />
           {open && <span className="text-sm font-semibold">CS Hub</span>}
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -44,7 +56,11 @@ export function AppSidebar() {
           <SidebarMenu>
             {NAV_ITEMS.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
+                  tooltip={item.label}
+                >
                   <Link href={item.href}>
                     <item.icon />
                     {open && <span>{item.label}</span>}
