@@ -5,6 +5,8 @@ import type {
   FinanceSummaryQuery,
   ListWithdrawalsQuery,
   WithdrawalSummaryQuery,
+  ListCampaignsQuery,
+  ListDeliveriesQuery,
 } from "@cs-hub/shared-types";
 
 export const queryKeys = {
@@ -29,5 +31,13 @@ export const queryKeys = {
     detail: (id: string) => ["withdrawals", "detail", id] as const,
     history: (id: string) => ["withdrawals", "history", id] as const,
     summary: (filters: Partial<WithdrawalSummaryQuery>) => ["withdrawals", "summary", filters] as const,
+  },
+  campaigns: {
+    list: (filters: Partial<ListCampaignsQuery>) => ["campaigns", "list", filters] as const,
+    detail: (id: string) => ["campaigns", "detail", id] as const,
+  },
+  deliveries: {
+    list: (filters: Partial<ListDeliveriesQuery>) => ["deliveries", "list", filters] as const,
+    detail: (id: string) => ["deliveries", "detail", id] as const,
   },
 };

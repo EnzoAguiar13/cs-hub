@@ -5,3 +5,5 @@ export * from "./creator.schema";
 export * from "./deal.schema";
 export * from "./finance.schema";
 export * from "./withdrawal.schema";
+export * from "./campaign.schema";
+export * from "./delivery.schema";

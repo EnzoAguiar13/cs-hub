@@ -34,6 +34,12 @@ export const creatorInputSchema = z.object({
   facebook: z.string().max(120).nullable().optional(),
   twitterX: z.string().max(120).nullable().optional(),
 
+  // redes sociais — métricas atualizadas manualmente (sem integração com APIs externas)
+  instagramFollowers: z.number().int().nonnegative().nullable().optional(),
+  tiktokFollowers: z.number().int().nonnegative().nullable().optional(),
+  youtubeSubscribers: z.number().int().nonnegative().nullable().optional(),
+  telegramMembers: z.number().int().nonnegative().nullable().optional(),
+
   // responsáveis
   csResponsibleId: z.string().nullable().optional(),
   managerId: z.string().nullable().optional(),
@@ -54,6 +60,7 @@ export type UpdateCreatorInput = z.infer<typeof updateCreatorSchema>;
 
 export const creatorSchema = creatorInputSchema.extend({
   id: z.string(),
+  socialMetricsUpdatedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

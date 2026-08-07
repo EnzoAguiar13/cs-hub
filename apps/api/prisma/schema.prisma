@@ -119,6 +119,13 @@ model Creator {
   facebook  String?
   twitterX  String?
 
+  // redes sociais — métricas atualizadas manualmente pelo CS (sem integração com APIs externas)
+  instagramFollowers  Int?
+  tiktokFollowers     Int?
+  youtubeSubscribers  Int?
+  telegramMembers     Int?
+  socialMetricsUpdatedAt DateTime?
+
   // responsáveis
   csResponsibleId String?
   csResponsible   User?   @relation("CSResponsible", fields: [csResponsibleId], references: [id])
@@ -137,6 +144,8 @@ model Creator {
   deals          Deal[]
   transactions   FinanceTransaction[]
   withdrawals    WithdrawalRequest[]
+  campaigns      Campaign[]
+  deliveries     Delivery[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -320,6 +329,87 @@ model WithdrawalStatusHistory {
   createdAt    DateTime          @default(now())
 
   @@index([withdrawalId, createdAt])
+}
+
+enum CampaignStatus {
+  PLANNED
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  name            String
+  objective       String?
+  status          CampaignStatus @default(PLANNED)
+  investmentCents Int            @default(0)
+  startDate       DateTime
+  endDate         DateTime?
+
+  creatorId String?
+  creator   Creator? @relation(fields: [creatorId], references: [id])
+
+  // resultados — ROI/CPA/conversão são calculados sob demanda a partir destes números
+  clicks        Int @default(0)
+  leads         Int @default(0)
+  registrations Int @default(0)
+  ftds          Int @default(0)
+  revenueCents  Int @default(0)
+
+  notes      String?
+  deliveries Delivery[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([creatorId])
+}
+
+enum DeliveryType {
+  STORY
+  FEED
+  REELS
+  VIDEO
+  LIVE
+  BANNER
+  TELEGRAM_GROUP
+  WHATSAPP_GROUP
+  PUSH
+  SMS
+}
+
+enum DeliveryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CORRECTION
+  PUBLISHED
+  LATE
+}
+
+model Delivery {
+  id         String         @id @default(cuid())
+  creatorId  String
+  creator    Creator        @relation(fields: [creatorId], references: [id])
+  campaignId String?
+  campaign   Campaign?      @relation(fields: [campaignId], references: [id])
+  type       DeliveryType
+  status     DeliveryStatus @default(PENDING)
+
+  scheduledAt   DateTime // data/hora combinada com o creator
+  publishedAt   DateTime?
+  responsibleId String?
+  fileKey       String? // upload de imagem/vídeo do criativo entregue
+  comments      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([scheduledAt])
 }
 
 model AuditLog {

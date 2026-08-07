@@ -33,6 +33,10 @@ const DEFAULT_VALUES: CreatorInput = {
   kick: null,
   facebook: null,
   twitterX: null,
+  instagramFollowers: null,
+  tiktokFollowers: null,
+  youtubeSubscribers: null,
+  telegramMembers: null,
   csResponsibleId: null,
   managerId: null,
   pixKey: null,
@@ -267,6 +271,36 @@ export function CreatorForm({ defaultValues, onSubmit, submitLabel }: CreatorFor
               />
             ),
           )}
+        </FieldSection>
+
+        <FieldSection title="Redes Sociais — Métricas (atualização manual)">
+          {(
+            [
+              ["instagramFollowers", "Seguidores Instagram"],
+              ["tiktokFollowers", "Seguidores TikTok"],
+              ["youtubeSubscribers", "Inscritos YouTube"],
+              ["telegramMembers", "Membros Telegram"],
+            ] as const
+          ).map(([name, label]) => (
+            <FormField
+              key={name}
+              control={form.control}
+              name={name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{label}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={field.value ?? ""}
+                      onChange={(event) => field.onChange(event.target.value === "" ? null : Number(event.target.value))}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          ))}
         </FieldSection>
 
         <FieldSection title="Responsáveis">

@@ -17,6 +17,10 @@ const OPTIONAL_NULLABLE_FIELDS = [
   "kick",
   "facebook",
   "twitterX",
+  "instagramFollowers",
+  "tiktokFollowers",
+  "youtubeSubscribers",
+  "telegramMembers",
   "csResponsibleId",
   "managerId",
   "pixKey",
@@ -41,10 +45,17 @@ function normalizeOptionalNulls<T extends Record<string, unknown>>(input: T): T 
   return result;
 }
 
+const SOCIAL_METRIC_FIELDS = ["instagramFollowers", "tiktokFollowers", "youtubeSubscribers", "telegramMembers"] as const;
+
 export function toCreateData(input: CreatorInput): CreateCreatorData {
-  return normalizeOptionalNulls(input) as CreateCreatorData;
+  return { ...normalizeOptionalNulls(input), socialMetricsUpdatedAt: null } as CreateCreatorData;
 }
 
 export function toUpdateData(input: UpdateCreatorInput): UpdateCreatorData {
-  return normalizeOptionalNulls(input) as UpdateCreatorData;
+  const normalized = normalizeOptionalNulls(input);
+  const touchesSocialMetrics = SOCIAL_METRIC_FIELDS.some((field) => field in input && input[field] !== undefined);
+  return {
+    ...normalized,
+    ...(touchesSocialMetrics ? { socialMetricsUpdatedAt: new Date() } : {}),
+  } as UpdateCreatorData;
 }

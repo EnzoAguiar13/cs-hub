@@ -24,6 +24,11 @@ export interface CreatorRecord {
   kick: string | null;
   facebook: string | null;
   twitterX: string | null;
+  instagramFollowers: number | null;
+  tiktokFollowers: number | null;
+  youtubeSubscribers: number | null;
+  telegramMembers: number | null;
+  socialMetricsUpdatedAt: Date | null;
   csResponsibleId: string | null;
   managerId: string | null;
   /** Stored encrypted (AES-256-GCM); the repository never encrypts/decrypts, only persists. */

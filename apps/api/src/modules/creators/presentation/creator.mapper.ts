@@ -3,7 +3,12 @@ import type { CreatorRecord, TimelineEventRecord } from "../domain/creator.repos
 import type { CreatorFileWithUrl } from "../application/list-files.use-case";
 
 export function toCreatorResponse(record: CreatorRecord): Creator {
-  return { ...record, createdAt: record.createdAt.toISOString(), updatedAt: record.updatedAt.toISOString() };
+  return {
+    ...record,
+    socialMetricsUpdatedAt: record.socialMetricsUpdatedAt ? record.socialMetricsUpdatedAt.toISOString() : null,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  };
 }
 
 export function toCreatorSummaryResponse(record: CreatorRecord): CreatorSummary {
@@ -16,7 +21,12 @@ export function toCreatorSummaryResponse(record: CreatorRecord): CreatorSummary 
     notes: _notes,
     ...rest
   } = record;
-  return { ...rest, createdAt: record.createdAt.toISOString(), updatedAt: record.updatedAt.toISOString() };
+  return {
+    ...rest,
+    socialMetricsUpdatedAt: record.socialMetricsUpdatedAt ? record.socialMetricsUpdatedAt.toISOString() : null,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  };
 }
 
 export function toTimelineResponse(record: TimelineEventRecord): CreatorTimelineEvent {
