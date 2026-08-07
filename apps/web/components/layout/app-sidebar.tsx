@@ -14,6 +14,7 @@ import {
   FileBarChart,
   LayoutDashboard,
   Bot,
+  Bell,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,6 +39,7 @@ const NAV_ITEMS = [
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
   { href: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { href: "/ia", label: "Agente de IA", icon: Bot },
+  { href: "/notificacoes", label: "Notificações", icon: Bell },
 ];
 
 export function AppSidebar() {

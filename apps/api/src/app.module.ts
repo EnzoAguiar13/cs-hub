@@ -17,6 +17,7 @@ import { ContractsModule } from "./modules/contracts/contracts.module";
 import { ExclusivitiesModule } from "./modules/exclusivities/exclusivities.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { AiModule } from "./modules/ai/ai.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "./common/guards/permissions.guard";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
@@ -45,6 +46,7 @@ import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
     ExclusivitiesModule,
     DashboardModule,
     AiModule,
+    NotificationsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

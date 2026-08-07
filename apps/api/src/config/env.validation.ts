@@ -23,6 +23,21 @@ export const envSchema = z.object({
 
   API_PORT: z.coerce.number().default(3001),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+
+  // Notificações — cada canal é opcional; se as variáveis não forem definidas, o canal
+  // correspondente registra a notificação como SKIPPED em vez de falhar.
+  SMTP_HOST: z.string().optional().default(""),
+  SMTP_PORT: z.coerce.number().optional().default(587),
+  SMTP_USER: z.string().optional().default(""),
+  SMTP_PASSWORD: z.string().optional().default(""),
+  SMTP_FROM: z.string().optional().default(""),
+  NOTIFICATIONS_EMAIL_TO: z.string().optional().default(""),
+
+  TELEGRAM_BOT_TOKEN: z.string().optional().default(""),
+  TELEGRAM_CHAT_ID: z.string().optional().default(""),
+
+  SLACK_WEBHOOK_URL: z.string().optional().default(""),
+  DISCORD_WEBHOOK_URL: z.string().optional().default(""),
 });
 
 export type Env = z.infer<typeof envSchema>;
