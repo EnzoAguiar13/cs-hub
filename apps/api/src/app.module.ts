@@ -10,6 +10,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { CreatorsModule } from "./modules/creators/creators.module";
 import { DealsModule } from "./modules/deals/deals.module";
 import { FinanceModule } from "./modules/finance/finance.module";
+import { WithdrawalsModule } from "./modules/withdrawals/withdrawals.module";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "./common/guards/permissions.guard";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
@@ -31,6 +32,7 @@ import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
     CreatorsModule,
     DealsModule,
     FinanceModule,
+    WithdrawalsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

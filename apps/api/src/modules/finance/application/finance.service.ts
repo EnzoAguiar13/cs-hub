@@ -46,6 +46,33 @@ export class FinanceService {
     });
   }
 
+  /**
+   * Registra uma despesa que nasce já paga (ex.: saque de creator marcado como Pago) — usado
+   * por outros módulos que representam o próprio evento de pagamento, sem passar pelo fluxo
+   * normal PENDING -> PAID.
+   */
+  async recordPaidExpense(input: {
+    description: string;
+    amountCents: number;
+    creatorId: string | null;
+    dealId?: string | null;
+    costCenter?: string | null;
+    method?: TransactionRecord["method"];
+  }, actorId: string): Promise<TransactionRecord> {
+    const created = await this.finance.create({
+      type: "EXPENSE",
+      description: input.description,
+      amountCents: input.amountCents,
+      costCenter: input.costCenter ?? null,
+      dueDate: new Date(),
+      method: input.method ?? null,
+      creatorId: input.creatorId,
+      dealId: input.dealId ?? null,
+      createdById: actorId,
+    });
+    return this.finance.update(created.id, { status: "PAID", paidAt: new Date() });
+  }
+
   async findById(id: string): Promise<TransactionWithCreatorNameRecord> {
     const transaction = await this.finance.findById(id);
     if (!transaction) throw new NotFoundException("Lançamento não encontrado");

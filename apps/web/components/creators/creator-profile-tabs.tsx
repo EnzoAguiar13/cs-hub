@@ -8,6 +8,7 @@ import { CreatorTimeline } from "@/components/creators/creator-timeline";
 import { CreatorFiles } from "@/components/creators/creator-files";
 import { EmptyState } from "@/components/creators/empty-state";
 import { CreatorFinanceTab } from "@/components/creators/creator-finance-tab";
+import { CreatorWithdrawalsTab } from "@/components/creators/creator-withdrawals-tab";
 import { useUpdateCreatorMutation } from "@/hooks/use-creators";
 import { ApiError } from "@/lib/api-client";
 
@@ -21,6 +22,7 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
         <TabsTrigger value="timeline">Timeline</TabsTrigger>
         <TabsTrigger value="files">Arquivos</TabsTrigger>
         <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+        <TabsTrigger value="saques">Saques</TabsTrigger>
         <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
         <TabsTrigger value="entregas">Entregas</TabsTrigger>
       </TabsList>
@@ -50,6 +52,9 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
 
       <TabsContent value="financeiro">
         <CreatorFinanceTab creatorId={creator.id} />
+      </TabsContent>
+      <TabsContent value="saques">
+        <CreatorWithdrawalsTab creatorId={creator.id} />
       </TabsContent>
       <TabsContent value="campanhas">
         <EmptyState title="Campanhas em breve" description="O módulo de campanhas chega numa fase futura." />

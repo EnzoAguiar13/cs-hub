@@ -136,6 +136,7 @@ model Creator {
   timelineEvents CreatorTimelineEvent[]
   deals          Deal[]
   transactions   FinanceTransaction[]
+  withdrawals    WithdrawalRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -267,6 +268,58 @@ model FinanceTransaction {
   @@index([creatorId])
   @@index([dealId])
   @@index([dueDate])
+}
+
+enum WithdrawalStatus {
+  NOT_AVAILABLE
+  AVAILABLE
+  PENDING
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  PAID
+  REJECTED
+  CANCELLED
+}
+
+// Um registro por creator por mês de competência — "Disponível para solicitar" nasce aqui
+// (via job/CS marcando `availableAmountCents`) e o creator/CS avança o status até PAID.
+model WithdrawalRequest {
+  id                   String           @id @default(cuid())
+  creatorId            String
+  creator              Creator          @relation(fields: [creatorId], references: [id])
+  competence           DateTime // primeiro dia do mês de competência
+  availableAmountCents Int
+  requestedAmountCents Int?
+  requestedAt          DateTime?
+  requestedById        String?
+  status               WithdrawalStatus @default(NOT_AVAILABLE)
+  paymentMethod        PaymentMethod?
+  proofFileKey         String?
+  paidAt               DateTime?
+  notes                String?
+
+  statusHistory WithdrawalStatusHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([creatorId, competence])
+  @@index([status])
+  @@index([competence])
+}
+
+/** Histórico de status do saque — quem alterou, quando e qual era o status anterior. */
+model WithdrawalStatusHistory {
+  id           String            @id @default(cuid())
+  withdrawalId String
+  withdrawal   WithdrawalRequest @relation(fields: [withdrawalId], references: [id])
+  fromStatus   WithdrawalStatus?
+  toStatus     WithdrawalStatus
+  actorId      String?
+  createdAt    DateTime          @default(now())
+
+  @@index([withdrawalId, createdAt])
 }
 
 model AuditLog {

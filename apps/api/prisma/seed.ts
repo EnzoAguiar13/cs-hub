@@ -3,7 +3,7 @@ import * as argon2 from "argon2";
 
 const prisma = new PrismaClient();
 
-const RESOURCES = ["creators", "users", "roles", "deals", "finance"] as const;
+const RESOURCES = ["creators", "users", "roles", "deals", "finance", "withdrawals"] as const;
 const ACTIONS = ["create", "read", "update", "delete", "export"] as const;
 
 /** Default role -> allowed actions per resource. Roles/resources absent from a role's map get no access. */
@@ -14,21 +14,25 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     roles: ACTIONS,
     deals: ACTIONS,
     finance: ACTIONS,
+    withdrawals: ACTIONS,
   },
   MANAGER: {
     creators: ["create", "read", "update", "delete", "export"],
     users: ["read"],
     deals: ["create", "read", "update", "export"],
     finance: ["read", "export"],
+    withdrawals: ["read", "update", "export"],
   },
   CS: {
     creators: ["create", "read", "update"],
     deals: ["read"],
+    withdrawals: ["create", "read", "update"],
   },
   FINANCE: {
     creators: ["read", "export"],
     deals: ["read", "export"],
     finance: ["create", "read", "update", "export"],
+    withdrawals: ["create", "read", "update", "export"],
   },
   MARKETING: {
     creators: ["read"],
@@ -38,6 +42,7 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     creators: ["read"],
     deals: ["read"],
     finance: ["read"],
+    withdrawals: ["read"],
   },
 };
 
