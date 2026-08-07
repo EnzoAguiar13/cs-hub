@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  passwordHash        String?
+  name                String
+  avatarUrl           String?
+  roleId              String
+  role                Role     @relation(fields: [roleId], references: [id])
+  permissionOverrides UserPermission[]
+  twoFactorSecret     String?
+  twoFactorEnabled    Boolean  @default(false)
+  googleId            String?  @unique
+  refreshTokens       RefreshToken[]
+  status              UserStatus @default(ACTIVE)
+  assignedCreators    Creator[] @relation("CSResponsible")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([roleId])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  id            String   @id @default(cuid())
+  resource      String
+  action        String
+  roles         RolePermission[]
+  userOverrides UserPermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+enum PermissionEffect {
+  GRANT
+  DENY
+}
+
+model UserPermission {
+  userId       String
+  permissionId String
+  effect       PermissionEffect
+  user         User       @relation(fields: [userId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([userId, permissionId])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+enum CreatorStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+model Creator {
+  id       String        @id @default(cuid())
+  photoUrl String?
+  name     String
+  nickname String?
+  status   CreatorStatus @default(ACTIVE)
+  category String?
+  isVip    Boolean       @default(false)
+  tags     String[]      @default([])
+
+  // contato
+  phone    String?
+  whatsapp String?
+  email    String?
+  country  String?
+  language String?
+
+  // redes sociais
+  telegram  String?
+  discord   String?
+  instagram String?
+  tiktok    String?
+  youtube   String?
+  kick      String?
+  facebook  String?
+  twitterX  String?
+
+  // responsáveis
+  csResponsibleId String?
+  csResponsible   User?   @relation("CSResponsible", fields: [csResponsibleId], references: [id])
+  managerId       String?
+
+  // financeiro/documentos — armazenados criptografados (AES-256-GCM) pela camada de aplicação
+  pixKey      String?
+  bankName    String?
+  bankAccount String?
+  cpf         String?
+  cnpj        String?
+
+  notes          String?
+  files          CreatorFile[]
+  timelineEvents CreatorTimelineEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([csResponsibleId])
+}
+
+enum FileType {
+  PHOTO
+  CONTRACT
+  DOCUMENT
+  OTHER
+}
+
+model CreatorFile {
+  id           String   @id @default(cuid())
+  creatorId    String
+  creator      Creator  @relation(fields: [creatorId], references: [id])
+  type         FileType
+  fileName     String
+  storageKey   String   @unique
+  mimeType     String
+  sizeBytes    Int
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  @@index([creatorId])
+}
+
+model CreatorTimelineEvent {
+  id          String   @id @default(cuid())
+  creatorId   String
+  creator     Creator  @relation(fields: [creatorId], references: [id])
+  type        String
+  description String
+  actorId     String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([creatorId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([resource, resourceId])
+  @@index([userId])
+}

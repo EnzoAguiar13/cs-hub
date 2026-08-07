@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  NEXT_PUBLIC_API_URL: http://localhost:3001
+
+jobs:
+  lint-typecheck-test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: turbo-${{ github.job }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @cs-hub/api prisma:generate
+
+      # Fail fast, cheapest checks first.
+      - name: Lint
+        run: pnpm turbo run lint
+
+      - name: Typecheck
+        run: pnpm turbo run typecheck
+
+      - name: Unit tests
+        run: pnpm turbo run test
+
+      - name: Build
+        run: pnpm turbo run build
+
+      # Not part of the `test` pipeline above: it spins up a real Postgres via
+      # Testcontainers, which ubuntu-latest runners support out of the box (Docker
+      # preinstalled), no extra `services:` needed.
+      - name: API e2e tests
+        run: pnpm --filter @cs-hub/api test:e2e

@@ -1,0 +1,121 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cshub
+      POSTGRES_PASSWORD: cshub
+      POSTGRES_DB: cshub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cshub"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-cshub}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-cshub12345}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # One-shot job: creates the app bucket and allows the browser to PUT/GET directly
+  # against MinIO using the presigned URLs the API hands out (no CORS = silent browser failure).
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-cshub}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-cshub12345}
+      MINIO_BUCKET: ${MINIO_BUCKET:-cs-hub-files}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
+        mc mb --ignore-existing local/$$MINIO_BUCKET
+        cat > /tmp/cors.json <<EOF
+        {
+          "CORSRules": [
+            {
+              "AllowedOrigin": ["$$CORS_ORIGIN"],
+              "AllowedMethod": ["PUT", "GET", "HEAD"],
+              "AllowedHeader": ["*"]
+            }
+          ]
+        }
+        EOF
+        mc cors set /tmp/cors.json local/$$MINIO_BUCKET
+
+  api:
+    image: node:20-alpine
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://cshub:cshub@postgres:5432/cshub?schema=public
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    # `prisma db push` (not `migrate`) on purpose: no migration history is checked in yet for
+    # this early stage of the project, and `migrate dev` needs an interactive TTY to name a new
+    # migration. Run `pnpm --filter @cs-hub/api prisma:migrate` yourself once you want real
+    # migration files instead of a schema push.
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @cs-hub/api prisma:generate && pnpm --filter @cs-hub/api prisma:push && pnpm --filter @cs-hub/api prisma:seed && pnpm --filter @cs-hub/api dev"
+
+  web:
+    image: node:20-alpine
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    env_file: .env
+    environment:
+      # The browser (not this container) calls the API, so this must stay host-reachable.
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @cs-hub/web dev"
+
+volumes:
+  postgres-data:
+  minio-data:

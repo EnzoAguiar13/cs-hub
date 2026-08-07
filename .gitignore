@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.next/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+.env
+.env.local
+!.env.example
+
+apps/api/generated/
+apps/api/prisma/migrations/.gitkeep
+
+.DS_Store
+Thumbs.db
+*.log

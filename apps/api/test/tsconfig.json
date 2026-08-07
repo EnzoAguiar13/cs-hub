@@ -1,0 +1,13 @@
+{
+  "extends": "@cs-hub/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "../",
+    "noEmit": true
+  },
+  "include": ["**/*.ts", "../src/**/*.ts"]
+}
