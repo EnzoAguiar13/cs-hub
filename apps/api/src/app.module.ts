@@ -8,6 +8,8 @@ import { validateEnv } from "./config/env.validation";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CreatorsModule } from "./modules/creators/creators.module";
+import { DealsModule } from "./modules/deals/deals.module";
+import { FinanceModule } from "./modules/finance/finance.module";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "./common/guards/permissions.guard";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
@@ -27,6 +29,8 @@ import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
     PrismaModule,
     AuthModule,
     CreatorsModule,
+    DealsModule,
+    FinanceModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

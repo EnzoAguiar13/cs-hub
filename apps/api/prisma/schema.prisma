@@ -134,6 +134,8 @@ model Creator {
   notes          String?
   files          CreatorFile[]
   timelineEvents CreatorTimelineEvent[]
+  deals          Deal[]
+  transactions   FinanceTransaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,6 +177,96 @@ model CreatorTimelineEvent {
   createdAt   DateTime @default(now())
 
   @@index([creatorId, createdAt])
+}
+
+enum DealType {
+  CPA
+  REVSHARE
+  HYBRID
+  FEE
+  MONTHLY
+  WEEKLY
+  BONUS
+}
+
+enum DealStatus {
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+model Deal {
+  id      String     @id @default(cuid())
+  creatorId String
+  creator Creator    @relation(fields: [creatorId], references: [id])
+  type    DealType
+  status  DealStatus @default(ACTIVE)
+
+  // valores — armazenados em centavos para evitar problemas de arredondamento
+  cpaValueCents    Int?
+  revSharePercent  Float?
+  fixedValueCents  Int?
+  targetValueCents Int?
+
+  startDate DateTime
+  endDate   DateTime?
+  autoRenew Boolean   @default(false)
+  notes     String?
+
+  transactions FinanceTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PIX
+  TED
+  BOLETO
+  OTHER
+}
+
+model FinanceTransaction {
+  id          String             @id @default(cuid())
+  type        TransactionType
+  status      TransactionStatus  @default(PENDING)
+  description String
+  amountCents Int
+  costCenter  String?
+  dueDate     DateTime
+  paidAt      DateTime?
+  method      PaymentMethod?
+  proofFileKey String?
+
+  creatorId String?
+  creator   Creator? @relation(fields: [creatorId], references: [id])
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+
+  createdById String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([creatorId])
+  @@index([dealId])
+  @@index([dueDate])
 }
 
 model AuditLog {

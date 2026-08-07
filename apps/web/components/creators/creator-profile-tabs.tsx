@@ -7,6 +7,7 @@ import { CreatorForm } from "@/components/creators/creator-form";
 import { CreatorTimeline } from "@/components/creators/creator-timeline";
 import { CreatorFiles } from "@/components/creators/creator-files";
 import { EmptyState } from "@/components/creators/empty-state";
+import { CreatorFinanceTab } from "@/components/creators/creator-finance-tab";
 import { useUpdateCreatorMutation } from "@/hooks/use-creators";
 import { ApiError } from "@/lib/api-client";
 
@@ -48,7 +49,7 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
       </TabsContent>
 
       <TabsContent value="financeiro">
-        <EmptyState title="Financeiro em breve" description="Este módulo será conectado numa fase futura do CS Hub." />
+        <CreatorFinanceTab creatorId={creator.id} />
       </TabsContent>
       <TabsContent value="campanhas">
         <EmptyState title="Campanhas em breve" description="O módulo de campanhas chega numa fase futura." />
