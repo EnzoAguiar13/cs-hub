@@ -6,9 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreatorForm } from "@/components/creators/creator-form";
 import { CreatorTimeline } from "@/components/creators/creator-timeline";
 import { CreatorFiles } from "@/components/creators/creator-files";
-import { EmptyState } from "@/components/creators/empty-state";
 import { CreatorFinanceTab } from "@/components/creators/creator-finance-tab";
 import { CreatorWithdrawalsTab } from "@/components/creators/creator-withdrawals-tab";
+import { CreatorCampaignsTab } from "@/components/creators/creator-campaigns-tab";
+import { CreatorDeliveriesTab } from "@/components/creators/creator-deliveries-tab";
+import { CreatorContractsTab } from "@/components/creators/creator-contracts-tab";
+import { CreatorExclusivityTab } from "@/components/creators/creator-exclusivity-tab";
 import { useUpdateCreatorMutation } from "@/hooks/use-creators";
 import { ApiError } from "@/lib/api-client";
 
@@ -17,7 +20,7 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
 
   return (
     <Tabs defaultValue="info">
-      <TabsList>
+      <TabsList className="flex-wrap">
         <TabsTrigger value="info">Info</TabsTrigger>
         <TabsTrigger value="timeline">Timeline</TabsTrigger>
         <TabsTrigger value="files">Arquivos</TabsTrigger>
@@ -25,6 +28,8 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
         <TabsTrigger value="saques">Saques</TabsTrigger>
         <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
         <TabsTrigger value="entregas">Entregas</TabsTrigger>
+        <TabsTrigger value="contratos">Contratos</TabsTrigger>
+        <TabsTrigger value="exclusividade">Exclusividade</TabsTrigger>
       </TabsList>
 
       <TabsContent value="info" className="max-w-3xl">
@@ -57,10 +62,16 @@ export function CreatorProfileTabs({ creator }: { creator: Creator }) {
         <CreatorWithdrawalsTab creatorId={creator.id} />
       </TabsContent>
       <TabsContent value="campanhas">
-        <EmptyState title="Campanhas em breve" description="O módulo de campanhas chega numa fase futura." />
+        <CreatorCampaignsTab creatorId={creator.id} />
       </TabsContent>
       <TabsContent value="entregas">
-        <EmptyState title="Entregas em breve" description="O módulo de entregas chega numa fase futura." />
+        <CreatorDeliveriesTab creatorId={creator.id} />
+      </TabsContent>
+      <TabsContent value="contratos">
+        <CreatorContractsTab creatorId={creator.id} />
+      </TabsContent>
+      <TabsContent value="exclusividade">
+        <CreatorExclusivityTab creatorId={creator.id} />
       </TabsContent>
     </Tabs>
   );

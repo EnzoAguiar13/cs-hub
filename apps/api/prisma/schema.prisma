@@ -146,6 +146,8 @@ model Creator {
   withdrawals    WithdrawalRequest[]
   campaigns      Campaign[]
   deliveries     Delivery[]
+  contracts      Contract[]
+  exclusivities  Exclusivity[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -410,6 +412,77 @@ model Delivery {
   @@index([creatorId])
   @@index([status])
   @@index([scheduledAt])
+}
+
+enum ContractStatus {
+  DRAFT
+  SENT
+  SIGNED
+  EXPIRED
+  CANCELLED
+}
+
+// Cada upload novo do "mesmo" contrato cria uma nova linha encadeada via previousVersionId,
+// em vez de sobrescrever o arquivo — dá o histórico de versões pedido no spec de graça.
+model Contract {
+  id                String   @id @default(cuid())
+  creatorId         String
+  creator           Creator  @relation(fields: [creatorId], references: [id])
+  title             String
+  version           Int      @default(1)
+  previousVersionId String?  @unique
+  previousVersion   Contract? @relation("ContractVersions", fields: [previousVersionId], references: [id])
+  nextVersion       Contract? @relation("ContractVersions")
+
+  fileKey   String
+  fileName  String
+  mimeType  String
+  sizeBytes Int
+
+  status       ContractStatus @default(DRAFT)
+  signedAt     DateTime?
+  expiresAt    DateTime?
+  notes        String?
+  uploadedById String
+
+  exclusivities Exclusivity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+enum ExclusivityStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model Exclusivity {
+  id         String            @id @default(cuid())
+  creatorId  String
+  creator    Creator           @relation(fields: [creatorId], references: [id])
+  company    String
+  brand      String
+  contractId String?
+  contract   Contract?         @relation(fields: [contractId], references: [id])
+
+  valueCents   Int
+  penaltyCents Int?
+  startDate    DateTime
+  endDate      DateTime
+  autoRenew    Boolean           @default(false)
+  status       ExclusivityStatus @default(ACTIVE)
+  notes        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([endDate])
 }
 
 model AuditLog {

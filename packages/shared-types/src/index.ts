@@ -7,3 +7,5 @@ export * from "./finance.schema";
 export * from "./withdrawal.schema";
 export * from "./campaign.schema";
 export * from "./delivery.schema";
+export * from "./contract.schema";
+export * from "./exclusivity.schema";

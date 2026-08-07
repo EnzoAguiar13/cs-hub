@@ -3,7 +3,18 @@ import * as argon2 from "argon2";
 
 const prisma = new PrismaClient();
 
-const RESOURCES = ["creators", "users", "roles", "deals", "finance", "withdrawals", "campaigns", "deliveries"] as const;
+const RESOURCES = [
+  "creators",
+  "users",
+  "roles",
+  "deals",
+  "finance",
+  "withdrawals",
+  "campaigns",
+  "deliveries",
+  "contracts",
+  "exclusivities",
+] as const;
 const ACTIONS = ["create", "read", "update", "delete", "export"] as const;
 
 /** Default role -> allowed actions per resource. Roles/resources absent from a role's map get no access. */
@@ -17,6 +28,8 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     withdrawals: ACTIONS,
     campaigns: ACTIONS,
     deliveries: ACTIONS,
+    contracts: ACTIONS,
+    exclusivities: ACTIONS,
   },
   MANAGER: {
     creators: ["create", "read", "update", "delete", "export"],
@@ -26,6 +39,8 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     withdrawals: ["read", "update", "export"],
     campaigns: ["create", "read", "update", "export"],
     deliveries: ["create", "read", "update", "export"],
+    contracts: ["create", "read", "update", "export"],
+    exclusivities: ["create", "read", "update", "export"],
   },
   CS: {
     creators: ["create", "read", "update"],
@@ -33,12 +48,15 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     withdrawals: ["create", "read", "update"],
     campaigns: ["read"],
     deliveries: ["create", "read", "update"],
+    contracts: ["create", "read"],
+    exclusivities: ["read"],
   },
   FINANCE: {
     creators: ["read", "export"],
     deals: ["read", "export"],
     finance: ["create", "read", "update", "export"],
     withdrawals: ["create", "read", "update", "export"],
+    exclusivities: ["read", "export"],
   },
   MARKETING: {
     creators: ["read"],
@@ -53,6 +71,8 @@ const ROLE_PERMISSIONS: Record<string, Partial<Record<(typeof RESOURCES)[number]
     withdrawals: ["read"],
     campaigns: ["read"],
     deliveries: ["read"],
+    contracts: ["read"],
+    exclusivities: ["read"],
   },
 };
 
