@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users2, Sparkles, Handshake, Wallet, Banknote, Megaphone, CalendarClock, CalendarDays } from "lucide-react";
+import { Users2, Sparkles, Handshake, Wallet, Banknote, Megaphone, CalendarClock, CalendarDays, FileBarChart } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   { href: "/campanhas", label: "Campanhas", icon: Megaphone },
   { href: "/entregas", label: "Entregas", icon: CalendarClock },
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
+  { href: "/relatorios", label: "Relatórios", icon: FileBarChart },
 ];
 
 export function AppSidebar() {
