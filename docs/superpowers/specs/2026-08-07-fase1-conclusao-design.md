@@ -24,9 +24,9 @@ conclusão; nenhuma decisão de arquitetura do spec original é revisitada.
   silencioso via cookie httpOnly no carregamento da página — mantém a separação que o backend
   já implementa (refresh token nunca chega ao JavaScript do cliente).
 - Dashboard desta fase é só o *shell* (sidebar, topbar, busca Ctrl+K, dark mode) — os widgets de
-  métricas (FTDs, GGR, ROI etc.) pertencem às fases futuras de Financeiro/Smartico/Tráfego.
-- Perfil do Creator: abas de Financeiro, Smartico, Campanhas e Entregas ficam como placeholder
-  "em breve", conforme já decidido no spec original.
+  métricas (FTDs, GGR, ROI etc.) pertencem às fases futuras de Financeiro/Tráfego.
+- Perfil do Creator: abas de Financeiro, Campanhas e Entregas ficam como placeholder "em breve",
+  conforme já decidido no spec original.
 
 ## Backend — wiring
 
@@ -86,7 +86,7 @@ Serviços `postgres`, `redis`, `minio` (+ um job one-shot para criar o bucket de
 - `/creators` — listagem via TanStack Table, sort/filtro/paginação server-side contra `GET /creators`.
 - `/creators/new` e `/creators/[id]` — formulário completo (React Hook Form + `creatorInputSchema`
   de `@cs-hub/shared-types`) e perfil em abas: Info · Timeline · Arquivos · Financeiro (em breve)
-  · Smartico (em breve) · Campanhas (em breve) · Entregas (em breve).
+  · Campanhas (em breve) · Entregas (em breve).
 
 ### Autenticação
 

@@ -6,11 +6,11 @@ Status: Aprovado
 ## Contexto
 
 CS Hub é um ERP/CRM completo para gestão de Customer Success, Afiliados, Influenciadores,
-Financeiro, Entregas e Performance no mercado de iGaming, com integração Smartico e um
-agente de IA. O escopo total (>20 subsistemas: Afiliados, Deals, Financeiro, Tráfego,
-Redes Sociais, Entregas, Exclusividade, Contratos, Calendário, Campanhas, Biblioteca,
-Relatórios, IA, Notificações multi-canal, integração Smartico) é grande demais para um
-único spec/plano de implementação. Este documento cobre apenas a **Fase 1**: a fundação
+Financeiro, Entregas e Performance no mercado de iGaming, com um agente de IA. O escopo
+total (>20 subsistemas: Afiliados, Deals, Financeiro, Tráfego, Redes Sociais, Entregas,
+Exclusividade, Contratos, Calendário, Campanhas, Biblioteca, Relatórios, IA, Notificações
+multi-canal) é grande demais para um único spec/plano de implementação. Este documento
+cobre apenas a **Fase 1**: a fundação
 técnica do sistema e o primeiro módulo de negócio (Afiliados/Creators), base da qual todos
 os módulos futuros dependem. Cada módulo subsequente terá seu próprio ciclo spec → plano →
 implementação.
@@ -24,14 +24,14 @@ implementação.
 - Upload de arquivos via MinIO local (S3-compatível), para troca trivial por S3/R2 em produção.
 - RBAC com 7 roles fixos + overrides de permissão individuais por usuário (GRANT/DENY).
 - Perfil de Creator: cadastro 100% completo (todos os campos solicitados) + timeline + upload
-  de arquivos/contratos já nesta fase. Abas de financeiro/Smartico/campanhas/entregas ficam
-  como placeholders "em breve", prontas para plugar quando os módulos correspondentes existirem.
+  de arquivos/contratos já nesta fase. Abas de financeiro/campanhas/entregas ficam como
+  placeholders "em breve", prontas para plugar quando os módulos correspondentes existirem.
 
 ## Fora de escopo (fases futuras)
 
-Deals, Financeiro, integração Smartico (SmarticoService, sync 15min), Entregas, Campanhas,
-Redes Sociais (métricas), Contratos/Exclusividade, Calendário, Biblioteca de criativos,
-Relatórios/exportação, Agente de IA, Notificações multi-canal (email/Telegram/WhatsApp/Slack/Discord).
+Deals, Financeiro, Entregas, Campanhas, Redes Sociais (métricas), Contratos/Exclusividade,
+Calendário, Biblioteca de criativos, Relatórios/exportação, Agente de IA, Notificações
+multi-canal (email/Telegram/WhatsApp/Slack/Discord).
 
 ## Arquitetura
 
@@ -302,7 +302,6 @@ server). `docker compose up` sobe o ambiente completo de desenvolvimento.
 ## Próximos passos (fora deste spec)
 
 Após a Fase 1 estar funcional, cada um dos módulos a seguir recebe seu próprio spec e plano
-de implementação, na ordem sugerida: (2) Integração Smartico (`SmarticoService`, sync
-automático, tela de login manual aprovado, logs/auditoria), (3) Deals + Financeiro,
-(4) Entregas + Calendário + Campanhas + Redes Sociais, (5) Contratos + Exclusividade,
-(6) Relatórios + exportação, (7) Agente de IA, (8) Notificações multi-canal.
+de implementação, na ordem sugerida: (2) Deals + Financeiro, (3) Entregas + Calendário +
+Campanhas + Redes Sociais, (4) Contratos + Exclusividade, (5) Relatórios + exportação,
+(6) Agente de IA, (7) Notificações multi-canal.
