@@ -6,6 +6,11 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+export const pinLoginSchema = z.object({
+  pin: z.string().min(4).max(16),
+});
+export type PinLoginInput = z.infer<typeof pinLoginSchema>;
+
 export const authenticatedUserSchema = z.object({
   id: z.string(),
   email: z.string().email(),

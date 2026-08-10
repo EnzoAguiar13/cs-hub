@@ -19,6 +19,7 @@ import { LogoutUseCase } from "./application/logout.use-case";
 import { EnableTwoFactorUseCase } from "./application/enable-two-factor.use-case";
 import { ConfirmTwoFactorUseCase } from "./application/confirm-two-factor.use-case";
 import { LoginWithGoogleUseCase } from "./application/login-with-google.use-case";
+import { LoginWithPinUseCase } from "./application/login-with-pin.use-case";
 import { IssueSessionUseCase } from "./application/issue-session.use-case";
 
 @Module({
@@ -40,6 +41,7 @@ import { IssueSessionUseCase } from "./application/issue-session.use-case";
     EnableTwoFactorUseCase,
     ConfirmTwoFactorUseCase,
     LoginWithGoogleUseCase,
+    LoginWithPinUseCase,
   ],
   exports: [ENCRYPTION_SERVICE],
 })

@@ -24,6 +24,11 @@ export const envSchema = z.object({
   API_PORT: z.coerce.number().default(3001),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
 
+  // Acesso simplificado por PIN — troca a tela de login por um único código compartilhado
+  // que loga como o usuário definido em SITE_PIN_USER_EMAIL (o admin seedado, por padrão).
+  SITE_PIN: z.string().min(4).default("9090"),
+  SITE_PIN_USER_EMAIL: z.string().default("admin@cshub.local"),
+
   // Notificações — cada canal é opcional; se as variáveis não forem definidas, o canal
   // correspondente registra a notificação como SKIPPED em vez de falhar.
   SMTP_HOST: z.string().optional().default(""),

@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { loginSchema, verify2faSchema, type LoginResponse } from "@cs-hub/shared-types";
+import { pinLoginSchema, type LoginResponse } from "@cs-hub/shared-types";
 import { API_URL, ApiError } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -26,69 +26,28 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 }
 
 export default function LoginPage() {
-  return (
-    <React.Suspense fallback={null}>
-      <LoginPageContent />
-    </React.Suspense>
-  );
-}
-
-function LoginPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuth();
-  const [challengeToken, setChallengeToken] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
-  const credentialsForm = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+  const form = useForm<z.infer<typeof pinLoginSchema>>({
+    resolver: zodResolver(pinLoginSchema),
+    defaultValues: { pin: "" },
   });
 
-  const twoFactorForm = useForm<z.infer<typeof verify2faSchema>>({
-    resolver: zodResolver(verify2faSchema),
-    defaultValues: { challengeToken: "", code: "" },
-  });
-
-  // Google sign-in for a 2FA-enabled account redirects back here with the challenge token
-  // instead of a session — same TOTP step as the password flow, just entered via a query param.
-  React.useEffect(() => {
-    const googleChallenge = searchParams.get("googleChallenge");
-    if (googleChallenge) {
-      setChallengeToken(googleChallenge);
-      twoFactorForm.setValue("challengeToken", googleChallenge);
-      router.replace("/login");
-    }
-  }, [searchParams, router, twoFactorForm]);
-
-  async function onSubmitCredentials(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof pinLoginSchema>) {
     setError(null);
     try {
-      const result = await postJson<LoginResponse>("/auth/login", values);
+      const result = await postJson<LoginResponse>("/auth/pin", values);
       if (result.requires2fa) {
-        setChallengeToken(result.challengeToken);
-        twoFactorForm.setValue("challengeToken", result.challengeToken);
+        // The PIN flow never issues a 2FA challenge today, but keep the contract honest.
+        setError("Esta conta exige verificação adicional. Contate um administrador.");
         return;
       }
       login(result.accessToken, result.user);
       router.replace("/");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Não foi possível entrar. Tente novamente.");
-    }
-  }
-
-  async function onSubmitTwoFactor(values: z.infer<typeof verify2faSchema>) {
-    setError(null);
-    try {
-      const result = await postJson<LoginResponse>("/auth/2fa/verify", values);
-      if (result.requires2fa) {
-        setError("Código inválido, tente novamente.");
-        return;
-      }
-      login(result.accessToken, result.user);
-      router.replace("/");
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Código inválido, tente novamente.");
+      setError(err instanceof ApiError ? err.message : "PIN inválido.");
     }
   }
 
@@ -97,9 +56,7 @@ function LoginPageContent() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">CS Hub</CardTitle>
-          <CardDescription>
-            {challengeToken ? "Digite o código do seu autenticador" : "Entre com suas credenciais"}
-          </CardDescription>
+          <CardDescription>Digite o PIN de acesso</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
@@ -108,51 +65,24 @@ function LoginPageContent() {
             </Alert>
           )}
 
-          {!challengeToken ? (
-            <form onSubmit={credentialsForm.handleSubmit(onSubmitCredentials)} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" autoComplete="email" {...credentialsForm.register("email")} />
-                {credentialsForm.formState.errors.email && (
-                  <p className="text-xs text-destructive">{credentialsForm.formState.errors.email.message}</p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  {...credentialsForm.register("password")}
-                />
-                {credentialsForm.formState.errors.password && (
-                  <p className="text-xs text-destructive">{credentialsForm.formState.errors.password.message}</p>
-                )}
-              </div>
-              <Button type="submit" className="w-full" disabled={credentialsForm.formState.isSubmitting}>
-                Entrar
-              </Button>
-              <Button variant="outline" className="w-full" type="button" asChild>
-                <a href={`${API_URL}/auth/google`}>Continuar com Google</a>
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={twoFactorForm.handleSubmit(onSubmitTwoFactor)} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="code">Código de 6 dígitos</Label>
-                <Input id="code" inputMode="numeric" maxLength={6} autoFocus {...twoFactorForm.register("code")} />
-                {twoFactorForm.formState.errors.code && (
-                  <p className="text-xs text-destructive">{twoFactorForm.formState.errors.code.message}</p>
-                )}
-              </div>
-              <Button type="submit" className="w-full" disabled={twoFactorForm.formState.isSubmitting}>
-                Verificar
-              </Button>
-              <Button variant="ghost" className="w-full" type="button" onClick={() => setChallengeToken(null)}>
-                Voltar
-              </Button>
-            </form>
-          )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pin">PIN</Label>
+              <Input
+                id="pin"
+                inputMode="numeric"
+                autoFocus
+                autoComplete="off"
+                {...form.register("pin")}
+              />
+              {form.formState.errors.pin && (
+                <p className="text-xs text-destructive">{form.formState.errors.pin.message}</p>
+              )}
+            </div>
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              Entrar
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
