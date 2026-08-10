@@ -6,6 +6,16 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+export const authenticatedUserSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  name: z.string(),
+  avatarUrl: z.string().nullable(),
+  role: z.string(),
+  twoFactorEnabled: z.boolean(),
+});
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
 export const loginResponseSchema = z.object({
   requires2fa: z.literal(true),
   challengeToken: z.string(),
@@ -13,6 +23,7 @@ export const loginResponseSchema = z.object({
   z.object({
     requires2fa: z.literal(false),
     accessToken: z.string(),
+    user: authenticatedUserSchema,
   }),
 );
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
@@ -38,13 +49,3 @@ export const refreshResponseSchema = z.object({
   accessToken: z.string(),
 });
 export type RefreshResponse = z.infer<typeof refreshResponseSchema>;
-
-export const authenticatedUserSchema = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  name: z.string(),
-  avatarUrl: z.string().nullable(),
-  role: z.string(),
-  twoFactorEnabled: z.boolean(),
-});
-export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

@@ -34,6 +34,10 @@ export class PermissionsGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request & { user?: RequestUser }>();
     const user = request.user;
     if (!user) throw new ForbiddenException("Not authenticated");
+    // Prisma treats an `undefined` filter value as "omit this condition", not "match
+    // nothing" — a malformed principal with no roleId would otherwise match any role's
+    // grant for the resource instead of being denied. Fail closed explicitly.
+    if (!user.roleId) throw new ForbiddenException("Not authenticated");
 
     const [roleGrant, override] = await Promise.all([
       this.prisma.rolePermission.findFirst({

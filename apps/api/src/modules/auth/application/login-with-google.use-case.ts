@@ -1,5 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { USER_REPOSITORY, type UserRepository } from "../domain/user.repository";
+import { TOKEN_SERVICE, type TokenService } from "../domain/token.service";
 import { IssueSessionUseCase } from "./issue-session.use-case";
 import type { LoginResult } from "./auth-result.types";
 
@@ -16,6 +17,7 @@ export interface GoogleProfile {
 export class LoginWithGoogleUseCase {
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: UserRepository,
+    @Inject(TOKEN_SERVICE) private readonly tokens: TokenService,
     private readonly issueSession: IssueSessionUseCase,
   ) {}
 
@@ -37,8 +39,13 @@ export class LoginWithGoogleUseCase {
       throw new ForbiddenException("Conta suspensa. Contate um administrador.");
     }
 
-    // Google's own sign-in already proves identity, so the TOTP challenge (designed for the
-    // password flow) is not layered on top here — avoids a second redirect mid-OAuth-callback.
+    // Google's own sign-in proves identity but not possession of the second factor — a
+    // 2FA-enabled account must still clear the TOTP challenge, the same as the password flow.
+    if (user.twoFactorEnabled) {
+      const challengeToken = await this.tokens.signTwoFactorChallenge(user.id);
+      return { requires2fa: true, challengeToken };
+    }
+
     const session = await this.issueSession.execute(user);
     return { requires2fa: false, ...session, user };
   }

@@ -131,8 +131,7 @@ export class AuthController {
     try {
       const result = await this.loginWithGoogle.execute(profile);
       if (result.requires2fa) {
-        // LoginWithGoogleUseCase never returns this branch today, but keep the contract honest.
-        res.redirect(`${webOrigin}/login?error=2fa_required`);
+        res.redirect(`${webOrigin}/login?googleChallenge=${encodeURIComponent(result.challengeToken)}`);
         return;
       }
       this.setRefreshCookie(res, result.refreshToken);

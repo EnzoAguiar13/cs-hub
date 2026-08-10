@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { loginSchema, verify2faSchema, type AuthenticatedUser } from "@cs-hub/shared-types";
+import { loginSchema, verify2faSchema, type LoginResponse } from "@cs-hub/shared-types";
 import { API_URL, ApiError } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-type LoginResult =
-  | { requires2fa: true; challengeToken: string }
-  | { requires2fa: false; accessToken: string; user: AuthenticatedUser };
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -30,7 +26,16 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 }
 
 export default function LoginPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <LoginPageContent />
+    </React.Suspense>
+  );
+}
+
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [challengeToken, setChallengeToken] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -45,10 +50,21 @@ export default function LoginPage() {
     defaultValues: { challengeToken: "", code: "" },
   });
 
+  // Google sign-in for a 2FA-enabled account redirects back here with the challenge token
+  // instead of a session — same TOTP step as the password flow, just entered via a query param.
+  React.useEffect(() => {
+    const googleChallenge = searchParams.get("googleChallenge");
+    if (googleChallenge) {
+      setChallengeToken(googleChallenge);
+      twoFactorForm.setValue("challengeToken", googleChallenge);
+      router.replace("/login");
+    }
+  }, [searchParams, router, twoFactorForm]);
+
   async function onSubmitCredentials(values: z.infer<typeof loginSchema>) {
     setError(null);
     try {
-      const result = await postJson<LoginResult>("/auth/login", values);
+      const result = await postJson<LoginResponse>("/auth/login", values);
       if (result.requires2fa) {
         setChallengeToken(result.challengeToken);
         twoFactorForm.setValue("challengeToken", result.challengeToken);
@@ -64,7 +80,7 @@ export default function LoginPage() {
   async function onSubmitTwoFactor(values: z.infer<typeof verify2faSchema>) {
     setError(null);
     try {
-      const result = await postJson<LoginResult>("/auth/2fa/verify", values);
+      const result = await postJson<LoginResponse>("/auth/2fa/verify", values);
       if (result.requires2fa) {
         setError("Código inválido, tente novamente.");
         return;
