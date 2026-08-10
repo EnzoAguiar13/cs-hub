@@ -47,7 +47,11 @@ export default function LoginPage() {
       login(result.accessToken, result.user);
       router.replace("/");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "PIN inválido.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Não foi possível conectar ao servidor. Verifique a configuração da API e tente novamente.");
+      }
     }
   }
 
