@@ -10,3 +10,8 @@ process.env.MINIO_ENDPOINT ??= "http://localhost:9000";
 process.env.MINIO_ROOT_USER ??= "cshub";
 process.env.MINIO_ROOT_PASSWORD ??= "cshub12345";
 process.env.MINIO_BUCKET ??= "cs-hub-files-test";
+// Passport's Google strategy validates these constructor options even though
+// the e2e suite never calls the Google OAuth routes.
+process.env.GOOGLE_CLIENT_ID ??= "cshub-e2e-client";
+process.env.GOOGLE_CLIENT_SECRET ??= "cshub-e2e-secret-not-for-prod";
+process.env.GOOGLE_CALLBACK_URL ??= "http://localhost:3001/auth/google/callback";
