@@ -37,6 +37,10 @@ packages       shared configuration and types
 docs           architectural notes and working references
 ```
 
+Read the [architecture](ARCHITECTURE.md) and [security](SECURITY.md) notes
+before running the sample locally.
+
 This is a portfolio-ready engineering sample, not a claim that a hosted demo
 or production customer data is available. Credentials and real creator data
-must remain outside the repository.
+must remain outside the repository. No open-source license is granted; reuse
+requires the author's permission.
