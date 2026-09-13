@@ -4,5 +4,6 @@
   "transform": {
     "^.+\\.ts$": ["ts-jest", { "tsconfig": "<rootDir>/test/tsconfig.json" }]
   },
+  "setupFiles": ["<rootDir>/test/setup-env.ts"],
   "moduleFileExtensions": ["js", "json", "ts"]
 }
